@@ -55,7 +55,7 @@ For advanced details on the deployment pattern, please refer to the official
  - It is recommended to push your own images to the cloud provider's container registry (ACR, ECR, etc.) as a best practice. In order to obtain a docker image for each product please refer to [U2 documentation](https://updates.docs.wso2.com/en/latest/updates/how-to-use-docker-images-to-receive-updates/).
  - You can also use your locally built docker images as well after adding relevant configurations in the values.yaml file under the following section.
   
-    ```
+    ```yaml
     deployment:
       image:
         imagePullSecrets:
@@ -115,7 +115,7 @@ The recommendation is to use [**NGINX Ingress Controller**](https://kubernetes.g
   - The ingress class should be set to nginx in the ingress resource if you are using the NGINX Ingress Controller.
   - Following are some of the recommended annotations to include in the helm charts for ingresses. These may vary depending on the requirements. Please refer to the [documentation](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/) for more information about the annotations.
   
-    ```
+    ```yaml
       nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
       nginx.ingress.kubernetes.io/affinity: "cookie"
       nginx.ingress.kubernetes.io/session-cookie-name: "route"
@@ -175,7 +175,7 @@ In addition to the primary, internal keystores and truststore files, you can als
 - Also the apictl can be used to encrpypt password as well. Reference can be found in [following](https://apim.docs.wso2.com/en/latest/install-and-setup/setup/api-controller/encrypting-secrets-with-ctl/).
 - Then the encrypted values should be filled in the the relevant fields of values.yaml.
 - Since internal keystore password is required to resolve the encrypted value in runtime, we need to store the value in the cloud provider's secret manager. You can use the cloud provider's secret store to store the password of the internal keystore. The following section can be used to add the cloud provider's credentials to fetch the internal keystore password. Configuration for aws can be at as below. 
-  ```
+  ```yaml
   internalKeystorePassword:
     # -- AWS Secrets Manager secret name
     secretName: ""
@@ -192,7 +192,7 @@ In addition to the primary, internal keystores and truststore files, you can als
  - Replace the values.yaml file in this directory with the values.yaml file in the cloned repository.
  - Add the following configurations to reflect the docker image created previously in the helm chart.
   
-    ```
+    ```yaml
     wso2:
       deployment:
         image:
@@ -206,7 +206,7 @@ In addition to the primary, internal keystores and truststore files, you can als
     ```
  - Provide the database configurations under the following section.
 
-    ```
+    ```yaml
     wso2:
       apim:
         configurations:
@@ -224,12 +224,6 @@ In addition to the primary, internal keystores and truststore files, you can als
   - Update the passwords for the admin credentials under the configuration directory.
   - Update passwords of the keystores accordingly under the security section of the values.yaml file.
   - Read the descriptions of other configurations and change them accordingly if there are any other requirements. A simple deployment can be achieved from the basic configurations provided in the values.yaml file. All the configurations for this helm chart is documented in the [documentation](https://github.com/wso2/helm-apim/blob/main/all-in-one/README.md).
-  - Change user id for container with following configuration if you have change under the configuring docker section above.
-    ```
-    securityContext:
-      # -- User ID of the container
-      runAsUser: 10001
-    ```
 
 #### 1.4  Managing Java Keystores and Truststores
 
@@ -247,7 +241,7 @@ In addition to the primary, internal keystores and truststore files, you can als
 
 Now deploy the Helm Chart using the following command after creating a namespace for the deployment. Replace <release-name> and <namespace> with appropriate values. Replace <helm-chart-path> with the path to the Helm Deployment.
   
-  ```
+  ```bash
   kubectl create namespace <namespace>
   helm install <release-name> <helm-chart-path> --version 4.5.0-1 --namespace <namespace> --dependency-update --create-namespace
   ```
@@ -256,7 +250,7 @@ Now deploy the Helm Chart using the following command after creating a namespace
 ### 3. Add a DNS record mapping the hostnames and the external IP
 
 Obtain the external IP (EXTERNAL-IP) of the API Manager Ingress resources, by listing down the Kubernetes Ingresses.
-```
+```bash
 kubectl get ing -n <NAMESPACE>
 ```
 
