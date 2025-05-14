@@ -25,6 +25,7 @@ For advanced details on the deployment pattern, please refer to the official
     - [2. Install the Helm Chart](#2-install-the-helm-chart)
     - [3. Add a DNS record mapping the hostnames and the external IP](#3-add-a-dns-record-mapping-the-hostnames-and-the-external-ip)
     - [4. Access Management Consoles](#4-access-management-consoles)
+  - [Minimal Configuration](#minimal-configuration)
 
 ## Prerequisites
 
@@ -57,6 +58,10 @@ For advanced details on the deployment pattern, please refer to the official
     ```
     deployment:
       image:
+        imagePullSecrets:
+          enabled: false
+          username: ""
+          password: ""
         registry: ""
         repository: ""
         digest: ""
@@ -68,27 +73,17 @@ For advanced details on the deployment pattern, please refer to the official
 
 
 #### 1.1. Additional Configurations
- - The default WSO2 docker images come with UID and GID set to 802. Some may consider this not up to standards since these values are usually expected to be over 10000. Therefore, it would be better to build the docker images from scratch using our product Dockerfiles with the relevant user and group IDs.
-  
-    ```
-    # set Docker image build arguments
-    # build arguments for user/group configurations
-    ARG USER=wso2carbon
-    ARG USER_ID=10001
-    ARG USER_GROUP=wso2
-    ARG USER_GROUP_ID=10001
-    ```
 - Since the products need to connect to databases at runtime, we need to include the relevant JDBC drivers in the distribution. This too can be included in the docker image building stage. For example, you can add the MySQL driver as follows.
     ```
     ADD --chown=wso2carbon:wso2 https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.28/mysql-connector-java-8.0.28.jar ${WSO2_SERVER_HOME}/repository/components/lib
     ```
 - Furthermore, if there are any customizations to the jars in the product, that too can be included in the docker image itself rather than mounting those from the deployment level (assuming that they are common to all environments).
 - Following is a sample Dockerfile to build a custom WSO2 APIM image. Depending on the requirement you may refer to the following and do the necessary additions. The below script will do the following,
-Use WSO2 APIM 4.3.0 as the base image
+Use WSO2 APIM 4.5.0 as the base image
 Change UID and GID to 10001. Default APIM image has 802 as UID and GID
 Copy 3rd party libraries to the <APIM_HOME>/lib directory
     ```
-    FROM docker.wso2.com/.wso2am:4.3.0.0
+    FROM docker.wso2.com/wso2am:4.5.0.0
 
     # Change UID and GID
     USER root
@@ -100,7 +95,7 @@ Copy 3rd party libraries to the <APIM_HOME>/lib directory
 
     ARG USER_HOME=/home/${USER}
     ARG WSO2_SERVER_NAME=wso2am
-    ARG WSO2_SERVER_VERSION=4.3.0
+    ARG WSO2_SERVER_VERSION=4.5.0
     ARG WSO2_SERVER=${WSO2_SERVER_NAME}-${WSO2_SERVER_VERSION}
     ARG WSO2_SERVER_HOME=${USER_HOME}/${WSO2_SERVER}
 
@@ -124,7 +119,6 @@ The recommendation is to use [**NGINX Ingress Controller**](https://kubernetes.g
       nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
       nginx.ingress.kubernetes.io/affinity: "cookie"
       nginx.ingress.kubernetes.io/session-cookie-name: "route"
-      nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
       nginx.ingress.kubernetes.io/proxy-buffering: "on"
       nginx.ingress.kubernetes.io/proxy-buffer-size: "8k"
     ```
@@ -132,6 +126,26 @@ The recommendation is to use [**NGINX Ingress Controller**](https://kubernetes.g
     ```
     kubectl create secret tls my-tls-secret --key <private key filename> --cert <certificate filename>
     ```
+
+### 3. Configuring the database
+Before running the API Manager, you must configure the databases and populate them with the initial data. All required database scripts are available in the `dbscripts` directory of the product pack. Locate the appropriate scripts for your chosen database engine and execute them accordingly. It is recommended to use two separate database users with limited permissions for enhanced security.
+
+An example for MySQL is provided below.
+```sql
+CREATE DATABASE apim_db character set latin1;
+CREATE DATABASE shared_db character set latin1;
+
+GRANT ALL ON apim_db.* TO 'apimadmin'@'%';
+
+CREATE USER 'sharedadmin'@'%' IDENTIFIED BY 'sharedadmin';
+GRANT ALL ON shared_db.* TO 'sharedadmin'@'%';
+
+```
+```bash
+mysql -h <DB_HOST> -P 3306 -u sharedadmin -p -Dshared_db < './dbscripts/mysql.sql';
+mysql -h <DB_HOST> -P 3306 -u apimadmin -p -Dapim_db < './dbscripts/apimgt/mysql.sql';
+```
+
 ## Configuration
 ### 1. Configuring helm charts
 
@@ -181,7 +195,11 @@ In addition to the primary, internal keystores and truststore files, you can als
     ```
     wso2:
       deployment:
-        image:		
+        image:
+          imagePullSecrets:
+            enabled: false
+            username: ""
+            password: ""		
           registry: ""
           repository: ""
           digest: ""
@@ -231,7 +249,7 @@ Now deploy the Helm Chart using the following command after creating a namespace
   
   ```
   kubectl create namespace <namespace>
-  helm install <release-name> <helm-chart-path> --version 4.3.0-1 --namespace <namespace> --dependency-update --create-namespace
+  helm install <release-name> <helm-chart-path> --version 4.5.0-1 --namespace <namespace> --dependency-update --create-namespace
   ```
 
 
@@ -260,4 +278,11 @@ hostnames and the external IP in the `/etc/hosts` file at the client-side.
 
 - API Manager Carbon Console: `https://<kubernetes.ingress.management.hostname>/carbon`
 
-  
+- Universal Gateway: `https://<kubernetes.ingress.gateway.hostname>`
+
+## Minimal Configuration
+
+If you want to try WSO2 API Manager with minimal configuration, you do not need to follow all the steps described above. You can simply use the default values provided in the default_values.yaml, which includes the H2 database and the default keystore and truststore. Once the service is up and running, deploy the NGINX Ingress Controller by following the steps outlined [here](#2-adding-ingress-controller).
+```bash
+helm install apim ./all-in-one -f default_values.yaml
+```
