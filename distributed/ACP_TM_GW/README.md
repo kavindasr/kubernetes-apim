@@ -84,7 +84,7 @@ For advanced details on the deployment pattern, please refer to the official
 Use WSO2 APIM 4.5.0 as the base image
 Change UID and GID to 10001. Default APIM image has 802 as UID and GID
 Copy 3rd party libraries to the <APIM_HOME>/lib directory
-    ```
+    ```dockerfile
     FROM docker.wso2.com/wso2am:4.5.0.0
 
     # Change UID and GID
