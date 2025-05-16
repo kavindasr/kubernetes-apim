@@ -167,7 +167,7 @@ wso2:
         # -- APIM SharedDB configurations. This is required for gateway only in a multi-tenancy scenario
         shared_db:
           # -- APIM SharedDB URL
-          url: "jdbc:mysql://<DB_URL>:3306/shared_db2?useSSL=false"
+          url: "jdbc:mysql://<DB_URL>:3306/shared_db?useSSL=false"
           # -- APIM SharedDB username
           username: "sharedadmin"
           # -- APIM SharedDB password
