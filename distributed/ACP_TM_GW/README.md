@@ -331,7 +331,7 @@ You can configure user store properties as described in this [documentation](htt
 > **Important:** If you do not want to configure any of the above properties, you must remove the `properties` block from the YAML file.
 
 #### 2.4 Configure JWKS URL
-By default, for the super tenant, the Resident Key Manager's JWKS URL is set to `https://localhost:9443/oauth2/jwks`. You can configure this URL for the super tenant using the Helm chart as shown below:
+By default, for the super tenant, the Resident Key Manager's JWKS URL is set to `https://<HOSTNAME>:9443/oauth2/jwks`. If you are using a virtual host like `am.wso2.com` that is not globally routable, this URL will be incorrect. You can configure the correct JWKS URL for the super tenant using the Helm chart as shown below:
 
 ```yaml
 wso2:
