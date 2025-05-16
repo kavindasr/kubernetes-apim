@@ -157,7 +157,7 @@ wso2:
       # -- Super admin username
       adminUsername: "admin"
       # -- Super admin password
-      adminPassword: "adminksr"
+      adminPassword: "admin"
       databases:
         # -- Database type. eg: mysql, oracle, mssql, postgres
         type: "mysql"
