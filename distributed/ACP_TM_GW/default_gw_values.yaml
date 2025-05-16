@@ -224,7 +224,7 @@ wso2:
             # -- Internal keystore password
             password: "wso2carbon"
             # -- Internal keystore key password
-            keyPassword: ""
+            keyPassword: "wso2carbon"
         truststore:
           # -- Truststore name
           name: "client-truststore.jks"
@@ -446,7 +446,7 @@ wso2:
         sleepSeconds: 10
 
     # Number of deployment replicas
-    replicas: 1
+    replicas: 2
     # HPA configurations
     # -- Minimum replicas for HPA
     minReplicas: 1
