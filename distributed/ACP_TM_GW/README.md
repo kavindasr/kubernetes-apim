@@ -158,7 +158,7 @@ Copy 3rd party libraries to the `<APIM_HOME>/lib` directory
 
 ### 1. General Configuration of Helm Charts
 
-The helm charts for the API Manager deployment are available in the [WSO2 Helm Chart Repository](https://github.com/wso2/helm-apim). You can either use the charts from the repository or clone the repository and use the charts from the local copy.
+The helm charts for the API Manager deployment are available in the [WSO2 Helm Chart Repository](https://github.com/wso2/helm-apim/tree/4.5.x). You can either use the charts from the repository or clone the repository and use the charts from the local copy.
 - The helm naming convention for APIM follows a simple pattern. The following format is used for naming the resources.
 ```<RELEASE_NAME>-<CHART_NAME>-<RESOURCE_NAME>```
 
