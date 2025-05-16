@@ -444,7 +444,7 @@ wso2:
         sleepSeconds: 10
 
     # Number of deployment replicas
-    replicas: 1
+    replicas: 2
     # HPA configurations
     # -- Minimum replicas for HPA
     minReplicas: 1
