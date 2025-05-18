@@ -1,6 +1,6 @@
-# Pattern 4: Helm Chart for Distributed API-M Deployment with Gateway and Traffic Manager Separated from the Control Plane
+# Pattern 5: Helm Chart for Distributed API-M Deployment with Gateway, Key Manager and Traffic Manager Separated from the Control Plane
 
-This is the standard distributed deployment for API Manager. The default configuration consists of two API control planes, two Traffic Managers, and two Universal Gateways. This is a production-ready deployment pattern.
+This is the fully distributed deployment for API Manager. The default configuration consists of two API control planes, two Traffic Managers, two Universal Gateways and two Key Managers.
 
 ![WSO2 API Manager pattern 4 deployment](https://apim.docs.wso2.com/en/4.5.0/assets/img/setup-and-install/deployment-tm.png)
 
@@ -8,7 +8,7 @@ For advanced details on the deployment pattern, please refer to the official
 [documentation](https://apim.docs.wso2.com/en/latest/install-and-setup/setup/single-node/all-in-one-deployment-overview/#single-node-deployment).
 
 ## Contents
-- [Pattern 4: API-M Deployment Overview](#pattern-4-helm-chart-for-distributed-api-m-deployment-with-traffic-manager-separated-from-the-control-plane)
+- [Pattern 5: Helm Chart for Distributed API-M Deployment with Gateway, Key Manager and Traffic Manager Separated from the Control Plane](#pattern-5-helm-chart-for-distributed-api-m-deployment-with-gateway-key-manager-and-traffic-manager-separated-from-the-control-plane)
   - [Contents](#contents)
   - [About this Document](#about-this-document)
   - [Prerequisites](#prerequisites)
@@ -34,8 +34,11 @@ For advanced details on the deployment pattern, please refer to the official
     - [4. Universal Gateway Configuration](#4-universal-gateway-configuration)
       - [4.1 Configure Key Manager, Eventhub and Throttling](#41-configure-key-manager-eventhub-and-throttling)
       - [4.2 Deploy Universal Gateway](#42-deploy-universal-gateway)
-    - [5. Add a DNS record mapping the hostnames and the external IP](#5-add-a-dns-record-mapping-the-hostnames-and-the-external-ip)
-    - [6. Access Management Consoles](#6-access-management-consoles)
+    - [5. Key Manager Configuration](#5-key-manager-configuration)
+      - [5.1 Configure Eventhub](#51-configure-eventhub)
+      - [5.2 Deploy Key Manager](#52-deploy-key-manager)
+    - [6. Add a DNS record mapping the hostnames and the external IP](#6-add-a-dns-record-mapping-the-hostnames-and-the-external-ip)
+    - [7. Access Management Consoles](#7-access-management-consoles)
 
 ## About this Document
 
@@ -72,6 +75,8 @@ This document provides comprehensive instructions for deploying WSO2 API Manager
   - API Control Plane (ACP) - [wso2am-acp](https://hub.docker.com/r/wso2/wso2am-acp)
   - Traffic Manager (TM) - [wso2am-tm](https://hub.docker.com/r/wso2/wso2am-tm)
   - Universal Gateway (GW) - [wso2am-universal-gw](https://hub.docker.com/r/wso2/wso2am-universal-gw)
+
+  > **Note:** There is no separate Docker image for the Key Manager. The ACP image should be used for the Key Manager component.
 
 - Since the products need to connect to databases at runtime, we need to include the relevant JDBC drivers in the distribution. This too can be included in the docker image building stage. For example, you can add the MySQL driver as follows.
   ```dockerfile
@@ -168,6 +173,11 @@ kubectl create secret generic jks-secret --from-file=wso2carbon.jks --from-file=
 1. Deploy ACP
 ```bash
 helm install apim-acp wso2/wso2-acp -f default_acp_values.yaml
+```
+
+2. Deploy KM
+```bash
+helm install apim-km wso2/wso2-km -f default_km_values.yaml
 ```
 
 2. Deploy TM
@@ -456,7 +466,28 @@ Replace <release-name> and <namespace> with appropriate values. Replace <helm-ch
   helm install <release-name> <helm-chart-path> --version 4.5.0-1 --namespace <namespace> --dependency-update --create-namespace
   ```
 
-### 5. Add a DNS record mapping the hostnames and the external IP
+### 5. Key Manager Configuration
+
+#### 5.1 Configure Eventhub
+- Configure eventhub
+  ```yaml
+  eventhub:
+    # -- Event hub (control plane) loadbalancer service url
+    serviceUrl: "<ACP_SERVICE_NAME>"
+    # -- Event hub service urls
+    urls:
+      - "<ACP-1_SERVICE_NAME>"
+      - "<ACP-2_SERVICE_NAME>"
+
+#### 5.2 Deploy Key Manager
+
+Replace <release-name> and <namespace> with appropriate values. Replace <helm-chart-path> with the path to the Helm Deployment.
+  
+  ```bash
+  helm install <release-name> <helm-chart-path> --version 4.5.0-1 --namespace <namespace> --dependency-update --create-namespace
+  ```
+
+### 6. Add a DNS record mapping the hostnames and the external IP
 
 Obtain the external IP (EXTERNAL-IP) of the API Manager Ingress resources, by listing down the Kubernetes Ingresses.
 ```
@@ -473,7 +504,7 @@ hostnames and the external IP in the `/etc/hosts` file at the client-side.
 <EXTERNAL-IP> <kubernetes.ingress.management.hostname> <kubernetes.ingress.gateway.hostname> <kubernetes.ingress.websub.hostname> <kubernetes.ingress.websocket.hostname> 
 ```
 
-### 6. Access Management Consoles
+### 7. Access Management Consoles
 
 - API Manager Publisher: `https://<kubernetes.ingress.management.hostname>/publisher`
 
