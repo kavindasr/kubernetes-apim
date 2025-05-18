@@ -15,6 +15,7 @@ For advanced details on the deployment pattern, please refer to the official
     - [1. Basic Configurations](#1-basic-configurations)
     - [2. Build Docker Images](#2-build-docker-images)
     - [3. Configure Database](#3-configure-database)
+  - [Minimal Configuration](#minimal-configuration)
   - [Configuration](#configuration)
     - [1. General Configuration of Helm Charts](#1-general-configuration-of-helm-charts)
       - [1.1 Add ingress controller](#11-add-ingress-controller)
@@ -35,7 +36,6 @@ For advanced details on the deployment pattern, please refer to the official
       - [4.2 Deploy Universal Gateway](#42-deploy-universal-gateway)
     - [5. Add a DNS record mapping the hostnames and the external IP](#5-add-a-dns-record-mapping-the-hostnames-and-the-external-ip)
     - [6. Access Management Consoles](#6-access-management-consoles)
-  - [Minimal Configuration](#minimal-configuration)
 
 ## About this Document
 
@@ -153,6 +153,35 @@ Copy 3rd party libraries to the `<APIM_HOME>/lib` directory
   mysql -h <DB_HOST> -P 3306 -u sharedadmin -p -Dshared_db < './dbscripts/mysql.sql';
   mysql -h <DB_HOST> -P 3306 -u apimadmin -p -Dapim_db < './dbscripts/apimgt/mysql.sql';
   ```
+
+
+## Minimal Configuration
+
+- We have provided a pre-configured YAML files to help you quickly start the deployment. You can use this file as a starting point to deploy this pattern. This deployment requires separate databases. Therefore, follow the steps in [2. Build Docker Images](#2-build-docker-images) to build the Docker images with JDBC drivers, and refer to [3. Configure Database](#3-configure-database) to set up the database.
+- Follow the steps in [1.2 Mount Keystore and Truststore](#12-mount-keystore-and-truststore) to create the truststore and keystore. If you want to use the WSO2 default keystore and truststore, you can find them in the `repository/resources/security` directory of the product pack. Navigate to this location and run the following command to create the secret:
+```bash
+kubectl create secret generic jks-secret --from-file=wso2carbon.jks --from-file=client-truststore.jks
+```
+- Run the following command to deploy the Helm charts:
+> **Important:** Naming conventions are important. If you want to change them, ensure consistency. 
+
+1. Deploy ACP
+```bash
+helm install apim-acp wso2/wso2-acp -f default_acp_values.yaml
+```
+
+2. Deploy TM
+```bash
+helm install apim-tm wso2/wso2-tm -f default_tm_values.yaml
+```
+
+3. Deploy GW
+```bash
+helm install apim-gw wso2/wso2-tm -f default_gw_values.yaml
+```
+
+- Once the service is up and running, deploy the NGINX Ingress Controller by following the steps outlined in [1.1 Add ingress controller](#11-add-ingress-controller).
+
 
 ## Configuration
 
@@ -453,30 +482,3 @@ hostnames and the external IP in the `/etc/hosts` file at the client-side.
 - API Manager Carbon Console: `https://<kubernetes.ingress.management.hostname>/carbon`
 
 - Universal Gateway: `https://<kubernetes.ingress.gateway.hostname>`
-
-## Minimal Configuration
-
-- We have provided a pre-configured YAML files to help you quickly start the deployment. You can use this file as a starting point to deploy this pattern. This deployment requires separate databases. Therefore, follow the steps in [2. Build Docker Images](#2-build-docker-images) to build the Docker images with JDBC drivers, and refer to [3. Configure Database](#3-configure-database) to set up the database.
-- Follow the steps in [1.2 Mount Keystore and Truststore](#12-mount-keystore-and-truststore) to create the truststore and keystore. If you want to use the WSO2 default keystore and truststore, you can find them in the `repository/resources/security` directory of the product pack. Navigate to this location and run the following command to create the secret:
-```bash
-kubectl create secret generic jks-secret --from-file=wso2carbon.jks --from-file=client-truststore.jks
-```
-- Run the following command to deploy the Helm charts:
-> **Important:** Naming conventions are important. If you want to change them, ensure consistency. 
-
-1. Deploy ACP
-```bash
-helm install apim-acp wso2/wso2-acp -f default_acp_values.yaml
-```
-
-2. Deploy TM
-```bash
-helm install apim-tm wso2/wso2-tm -f default_tm_values.yaml
-```
-
-3. Deploy GW
-```bash
-helm install apim-gw wso2/wso2-tm -f default_gw_values.yaml
-```
-
-- Once the service is up and running, deploy the NGINX Ingress Controller by following the steps outlined in [1.1 Add ingress controller](#11-add-ingress-controller).
