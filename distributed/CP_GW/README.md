@@ -149,12 +149,12 @@ kubectl create secret generic jks-secret --from-file=wso2carbon.jks --from-file=
 
 1. Deploy All-in-one
 ```bash
-helm install apim-acp wso2/wso2-acp -f default_values.yaml
+helm install apim wso2/wso2am-all-in-one -f default_values.yaml
 ```
 
 3. Deploy GW
 ```bash
-helm install apim-gw wso2/wso2-tm -f default_gw_values.yaml
+helm install apim-gw wso2/wso2am-gw -f default_gw_values.yaml
 ```
 
 - Once the service is up and running, deploy the NGINX Ingress Controller by following the steps outlined in [1.1 Add ingress controller](#11-add-ingress-controller).
