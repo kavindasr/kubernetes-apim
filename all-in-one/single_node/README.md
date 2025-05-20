@@ -1,6 +1,6 @@
 # Pattern 0: API-M Deployment with all-in-one setup
 
-This deployment consists of a single API-M node with a single API-M runtime. You can use this pattern if you expect to receive low traffic to your deployment and do not need any high availability in your environement.
+This deployment consists of a single API-M node with a single API-M runtime. You can use this pattern if you expect to receive low traffic to your deployment and do not need any high availability in your environment.
 
 ![WSO2 API Manager pattern 1 deployment](https://apim.docs.wso2.com/en/4.3.0/assets/img/setup-and-install/single-node-apim-deployment.png)
 
@@ -8,20 +8,20 @@ For advanced details on the deployment pattern, please refer to the official
 [documentation](https://apim.docs.wso2.com/en/latest/install-and-setup/setup/single-node/all-in-one-deployment-overview/#single-node-deployment).
 
 ## Contents
-- [Pattern 1: API-M Deployment with all-in-one setup](#pattern-1-api-m-deployment-with-all-in-one-setup)
+- [Pattern 0: API-M Deployment with all-in-one setup](#pattern-0-api-m-deployment-with-all-in-one-setup)
   - [Contents](#contents)
   - [Prerequisites](#prerequisites)
   - [Setup](#setup)
     - [1. Configuring docker images](#1-configuring-docker-images)
       - [1.1. Additional Configurations](#11-additional-configurations)
-    - [2. Add ingress controller](#2-adding-ingress-controller)
+    - [2. Add ingress controller](#2-add-ingress-controller)
   - [Configuration](#configuration)
     - [1. Configuring helm charts](#1-configuring-helm-charts)
       - [1.1 Mounting Keystore and Truststore using a Kubernetes Secret](#11-mounting-keystore-and-truststore-using-a-kubernetes-secret)
       - [1.2 Encrypting secrets](#12-encrypting-secrets)
       - [1.3 Updating the Helm Chart](#13-updating-the-helm-chart)
       - [1.4  Managing Java Keystores and Truststores](#14--managing-java-keystores-and-truststores)
-      - [1.5 Configure SSL in Service Exposure](#15-configuring-ssl-in-service-exposure)
+      - [1.5 Configure SSL in Service Exposure](#15-configure-ssl-in-service-exposure)
     - [2. Install the Helm Chart](#2-install-the-helm-chart)
     - [3. Add a DNS record mapping the hostnames and the external IP](#3-add-a-dns-record-mapping-the-hostnames-and-the-external-ip)
     - [4. Access Management Consoles](#4-access-management-consoles)
@@ -51,7 +51,7 @@ For advanced details on the deployment pattern, please refer to the official
 
 ## Minimal Configuration
 
-If you want to try WSO2 API Manager with minimal configuration, you do not need to follow all the steps described above. You can simply use the default values provided in the default_values.yaml, which includes the H2 database and the default keystore and truststore. Once the service is up and running, deploy the NGINX Ingress Controller by following the steps outlined [here](#2-adding-ingress-controller).
+If you want to try WSO2 API Manager with minimal configuration, you do not need to follow all the steps described above. You can simply use the default values provided in the default_values.yaml, which includes the H2 database and the default keystore and truststore. Once the service is up and running, deploy the NGINX Ingress Controller by following the steps outlined [here](#2-add-ingress-controller).
 ```bash
 helm install apim ./all-in-one -f default_values.yaml
 ```
@@ -114,7 +114,7 @@ In addition to the primary, internal keystores and truststore files, you can als
   ```
   sh cipher-tool.sh -Dconfigure
   ```
-- Also the apictl can be used to encrpypt password as well. Reference can be found in [following](https://apim.docs.wso2.com/en/latest/install-and-setup/setup/api-controller/encrypting-secrets-with-ctl/).
+- Also the apictl can be used to encrypt password as well. Reference can be found in [following](https://apim.docs.wso2.com/en/latest/install-and-setup/setup/api-controller/encrypting-secrets-with-ctl/).
 - Then the encrypted values should be filled in the the relevant fields of values.yaml.
 - Since internal keystore password is required to resolve the encrypted value in runtime, we need to store the value in the cloud provider's secret manager. You can use the cloud provider's secret store to store the password of the internal keystore. The following section can be used to add the cloud provider's credentials to fetch the internal keystore password. Configuration for aws can be at as below. 
   ```yaml
@@ -124,7 +124,7 @@ In addition to the primary, internal keystores and truststore files, you can als
     # -- AWS Secrets Manager secret key
     secretKey: ""
   ```
-  > Please note that currently  AWS, Azure and GCP Secrets Managers are only supported for this.
+  > Please note that currently AWS, Azure and GCP Secrets Managers are only supported for this.
 
 
 
