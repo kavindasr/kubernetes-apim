@@ -22,7 +22,7 @@ For advanced details on the deployment pattern, please refer to the official
       - [1.2 Mount Keystore and Truststore](#12-mount-keystore-and-truststore)
       - [1.3 Encrypting secrets](#13-encrypting-secrets)
       - [1.4 Configure Docker image and Databases](#14-configure-docker-image-and-databases)
-      - [1.5 Configuring SSL in Service Exposure](#15-configuring-ssl-in-service-exposure)
+      - [1.5 Configure SSL in Service Exposure](#15-configure-ssl-in-service-exposure)
     - [2. All-in-one Configurations](#2-all-in-one-configurations)
       - [2.1 Configure multiple gateways](#21-configure-multiple-gateways)
       - [2.2 Configure User Store Properties](#22-configure-user-store-properties)
@@ -278,7 +278,7 @@ In addition to the primary, internal keystores and truststore files, you can als
       adminPassword: ""
     ```
   
-#### 1.5 Configuring SSL in Service Exposure
+#### 1.5 Configure SSL in Service Exposure
 
 * For WSO2 recommended best practices in configuring SSL when exposing the internal product services to outside of the Kubernetes cluster,
   please refer to the [official WSO2 container guide](https://github.com/wso2/container-guide/blob/master/route/Routing.md#configuring-ssl).
@@ -345,7 +345,7 @@ wso2:
       oauth_config:
         oauth2JWKSUrl: "https://<ALL-IN-ONE_SERVICE_NAME>:9443/oauth2/jwks"
 ```
-#### 2.5 Deploy ACP
+#### 2.5 Deploy All-in-One
 
 Now deploy the Helm Chart using the following command after creating a namespace for the deployment. Replace <release-name> and <namespace> with appropriate values. Replace <helm-chart-path> with the path to the Helm Deployment.
   
